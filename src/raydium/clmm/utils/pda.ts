@@ -2,7 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 
 import { findProgramAddress, METADATA_PROGRAM_ID } from "../../../common";
 
-import { i32ToBytes, u16ToBytes } from "./util";
+import { i32ToBytes } from "./util";
 
 export const AMM_CONFIG_SEED = Buffer.from("amm_config", "utf8");
 export const POOL_SEED = Buffer.from("pool", "utf8");
@@ -21,7 +21,7 @@ export function getPdaAmmConfigId(
   publicKey: PublicKey;
   nonce: number;
 } {
-  return findProgramAddress([AMM_CONFIG_SEED, u16ToBytes(index)], programId);
+  return findProgramAddress([AMM_CONFIG_SEED], programId);
 }
 
 export function getPdaPoolId(
