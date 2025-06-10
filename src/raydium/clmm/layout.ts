@@ -8,9 +8,9 @@ export const ClmmConfigLayout = struct([
   u8("bump"),
   u16("index"),
   publicKey(""),
+  u16("tickSpacing"),
   u32("protocolFeeRate"),
   u32("tradeFeeRate"),
-  u16("tickSpacing"),
   seq(u64(), 8, ""),
 ]);
 
