@@ -14,10 +14,7 @@ export const OPERATION_SEED = Buffer.from("operation", "utf8");
 export const POOL_TICK_ARRAY_BITMAP_SEED = Buffer.from("pool_tick_array_bitmap_extension", "utf8");
 export const OBSERVATION_SEED = Buffer.from("observation", "utf8");
 
-export function getPdaAmmConfigId(
-  programId: PublicKey,
-  index: number,
-): {
+export function getPdaAmmConfigId(programId: PublicKey): {
   publicKey: PublicKey;
   nonce: number;
 } {

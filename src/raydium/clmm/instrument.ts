@@ -38,6 +38,7 @@ import {
   getPdaTickArrayAddress,
   getPdaLockClPositionIdV2,
   getPdaMintExAccount,
+  getPdaAmmConfigId,
 } from "./utils/pda";
 import { PoolUtils } from "./utils/pool";
 import { TickUtils } from "./utils/tick";
@@ -321,11 +322,14 @@ export class ClmmInstrument {
       ...(exTickArrayBitmap ? [{ pubkey: exTickArrayBitmap, isSigner: false, isWritable: true }] : []),
     ];
 
+    const { publicKey: ammConfig } = getPdaAmmConfigId(programId);
+
     const keys = [
       { pubkey: payer, isSigner: true, isWritable: true },
       { pubkey: positionNftOwner, isSigner: false, isWritable: false },
       { pubkey: positionNftMint, isSigner: true, isWritable: true },
       { pubkey: positionNftAccount, isSigner: false, isWritable: true },
+      { pubkey: ammConfig, isSigner: false, isWritable: false },
       { pubkey: poolId, isSigner: false, isWritable: true },
       { pubkey: protocolPosition, isSigner: false, isWritable: true },
       { pubkey: tickArrayLower, isSigner: false, isWritable: true },
@@ -818,11 +822,14 @@ export class ClmmInstrument {
       ...(exTickArrayBitmap ? [{ pubkey: exTickArrayBitmap, isSigner: false, isWritable: true }] : []),
     ];
 
+    const { publicKey: ammConfig } = getPdaAmmConfigId(programId);
+
     const keys = [
       { pubkey: payer, isSigner: true, isWritable: true },
       { pubkey: positionNftOwner, isSigner: false, isWritable: false },
       { pubkey: positionNftMint, isSigner: true, isWritable: true },
       { pubkey: positionNftAccount, isSigner: false, isWritable: true },
+      { pubkey: ammConfig, isSigner: false, isWritable: false },
       { pubkey: poolId, isSigner: false, isWritable: true },
       { pubkey: protocolPosition, isSigner: false, isWritable: true },
       { pubkey: tickArrayLower, isSigner: false, isWritable: true },
