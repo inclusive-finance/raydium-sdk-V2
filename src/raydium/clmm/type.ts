@@ -492,6 +492,29 @@ export interface OpenPositionFromLiquidity<T = TxVersion.LEGACY> {
   feePayer?: PublicKey;
 }
 
+export interface OpenPositionFromLiquidityByProjectManager<T = TxVersion.LEGACY> {
+  poolInfo: ApiV3PoolInfoConcentratedItem;
+  poolKeys?: ClmmKeys;
+  ownerInfo: {
+    useSOLBalance?: boolean; // if has WSOL mint (default: true)
+  };
+  amountMaxA: BN;
+  amountMaxB: BN;
+  tickLower: number;
+  tickUpper: number;
+  liquidity: BN;
+  associatedOnly?: boolean;
+  checkCreateATAOwner?: boolean;
+  withMetadata?: "create" | "no-create";
+  getEphemeralSigners?: (k: number) => any;
+  txVersion?: T;
+  computeBudgetConfig;
+  nft2022?: boolean;
+  txTipConfig?: TxTipConfig;
+  feePayer?: PublicKey;
+  priceUpdateAccount?: PublicKey;
+}
+
 export interface OpenPositionFromLiquidityExtInfo {
   address: {
     nftMint: PublicKey;
