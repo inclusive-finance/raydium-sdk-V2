@@ -46,6 +46,7 @@ import {
   SetRewardParams,
   SetRewardsParams,
   ClmmLockAddress,
+  OpenPositionFromLiquidityByProjectManager,
 } from "./type";
 import { MAX_SQRT_PRICE_X64, MIN_SQRT_PRICE_X64, mockV3CreatePoolInfo, ZERO } from "./utils/constants";
 import { MathUtil, SqrtPriceMath } from "./utils/math";
@@ -384,6 +385,110 @@ export class Clmm extends ModuleBase {
       withMetadata,
       getEphemeralSigners,
       nft2022,
+    });
+    txBuilder.addInstruction(makeOpenPositionInstructions);
+    txBuilder.addCustomComputeBudget(computeBudgetConfig);
+    txBuilder.addTipInstruction(txTipConfig);
+    return txBuilder.versionBuild<OpenPositionFromLiquidityExtInfo>({
+      txVersion,
+      extInfo: { address: makeOpenPositionInstructions.address },
+    }) as Promise<MakeTxData<T, OpenPositionFromLiquidityExtInfo>>;
+  }
+
+  public async openPositionFromLiquidityByProjectManager<T extends TxVersion>({
+    poolInfo,
+    poolKeys: propPoolKeys,
+    ownerInfo,
+    amountMaxA,
+    amountMaxB,
+    tickLower,
+    tickUpper,
+    liquidity,
+    associatedOnly = true,
+    checkCreateATAOwner = false,
+    withMetadata = "create",
+    txVersion,
+    computeBudgetConfig,
+    txTipConfig,
+    getEphemeralSigners,
+    nft2022,
+    feePayer,
+    priceUpdateAccount,
+  }: OpenPositionFromLiquidityByProjectManager<T>): Promise<MakeTxData<T, OpenPositionFromLiquidityExtInfo>> {
+    if (this.scope.availability.createConcentratedPosition === false)
+      this.logAndCreateError("open position feature disabled in your region");
+    const txBuilder = this.createTxBuilder(feePayer);
+
+    let ownerTokenAccountA: PublicKey | null = null;
+    let ownerTokenAccountB: PublicKey | null = null;
+    const mintAUseSOLBalance = ownerInfo.useSOLBalance && poolInfo.mintA.address === WSOLMint.toBase58();
+    const mintBUseSOLBalance = ownerInfo.useSOLBalance && poolInfo.mintB.address === WSOLMint.toBase58();
+
+    const { account: _ownerTokenAccountA, instructionParams: _tokenAccountAInstruction } =
+      await this.scope.account.getOrCreateTokenAccount({
+        tokenProgram: poolInfo.mintA.programId,
+        mint: new PublicKey(poolInfo.mintA.address),
+        owner: this.scope.ownerPubKey,
+
+        createInfo:
+          mintAUseSOLBalance || amountMaxA.isZero()
+            ? {
+              payer: this.scope.ownerPubKey,
+              amount: amountMaxA,
+            }
+            : undefined,
+
+        skipCloseAccount: !mintAUseSOLBalance,
+        notUseTokenAccount: mintAUseSOLBalance,
+        associatedOnly: mintAUseSOLBalance ? false : associatedOnly,
+        checkCreateATAOwner,
+      });
+    if (_ownerTokenAccountA) ownerTokenAccountA = _ownerTokenAccountA;
+    txBuilder.addInstruction(_tokenAccountAInstruction || {});
+
+    const { account: _ownerTokenAccountB, instructionParams: _tokenAccountBInstruction } =
+      await this.scope.account.getOrCreateTokenAccount({
+        tokenProgram: poolInfo.mintB.programId,
+        mint: new PublicKey(poolInfo.mintB.address),
+        owner: this.scope.ownerPubKey,
+
+        createInfo:
+          mintBUseSOLBalance || amountMaxB.isZero()
+            ? {
+              payer: this.scope.ownerPubKey!,
+              amount: amountMaxB,
+            }
+            : undefined,
+        skipCloseAccount: !mintBUseSOLBalance,
+        notUseTokenAccount: mintBUseSOLBalance,
+        associatedOnly: mintBUseSOLBalance ? false : associatedOnly,
+        checkCreateATAOwner,
+      });
+    if (_ownerTokenAccountB) ownerTokenAccountB = _ownerTokenAccountB;
+    txBuilder.addInstruction(_tokenAccountBInstruction || {});
+
+    if (ownerTokenAccountA === undefined || ownerTokenAccountB === undefined)
+      this.logAndCreateError("cannot found target token accounts", "tokenAccounts", this.scope.account.tokenAccounts);
+
+    const poolKeys = propPoolKeys || (await this.getClmmPoolKeys(poolInfo.id));
+
+    const makeOpenPositionInstructions = await ClmmInstrument.openPositionFromLiquidityInstructions({
+      poolInfo,
+      poolKeys,
+      ownerInfo: {
+        wallet: this.scope.ownerPubKey,
+        tokenAccountA: ownerTokenAccountA!,
+        tokenAccountB: ownerTokenAccountB!,
+      },
+      tickLower,
+      tickUpper,
+      liquidity,
+      amountMaxA,
+      amountMaxB,
+      withMetadata,
+      getEphemeralSigners,
+      nft2022,
+      priceUpdateAccount,
     });
     txBuilder.addInstruction(makeOpenPositionInstructions);
     txBuilder.addCustomComputeBudget(computeBudgetConfig);
