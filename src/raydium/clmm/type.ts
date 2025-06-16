@@ -298,6 +298,16 @@ export interface CreateConcentratedPool<T = TxVersion.LEGACY> {
   getObserveState?: boolean;
   txVersion?: T;
   feePayer?: PublicKey;
+  exclusiveTradingPeriodStartTime: BN;
+  exclusiveTradingPeriodEndTime: BN;
+  projectManager: PublicKey;
+  feeTierIndex?: number;
+  launchType: number;
+
+  hyperlaneProgramId: PublicKey;
+  hyperlaneUniqueMessageIdKey: PublicKey;
+  vaultProgramId: PublicKey;
+  splNoopProgramId: PublicKey;
 }
 
 export interface UserPositionAccount {

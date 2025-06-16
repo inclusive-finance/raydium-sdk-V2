@@ -87,6 +87,15 @@ export class Clmm extends ModuleBase {
       txVersion,
       txTipConfig,
       feePayer,
+      exclusiveTradingPeriodStartTime,
+      exclusiveTradingPeriodEndTime,
+      projectManager,
+      feeTierIndex,
+      launchType,
+      hyperlaneProgramId,
+      hyperlaneUniqueMessageIdKey,
+      vaultProgramId,
+      splNoopProgramId,
     } = props;
     const txBuilder = this.createTxBuilder(feePayer);
     const [mintA, mintB, initPrice] = new BN(new PublicKey(mint1.address).toBuffer()).gt(
@@ -119,6 +128,15 @@ export class Clmm extends ModuleBase {
       initialPriceX64,
       forerunCreate: !getObserveState && forerunCreate,
       extendMintAccount,
+      exclusiveTradingPeriodStartTime,
+      exclusiveTradingPeriodEndTime,
+      projectManager,
+      feeTierIndex,
+      launchType,
+      hyperlaneProgramId,
+      hyperlaneUniqueMessageIdKey,
+      vaultProgramId,
+      splNoopProgramId,
     });
 
     txBuilder.addInstruction(insInfo);

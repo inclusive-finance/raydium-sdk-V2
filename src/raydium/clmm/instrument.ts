@@ -43,6 +43,8 @@ import {
 import { PoolUtils } from "./utils/pool";
 import { TickUtils } from "./utils/tick";
 import { ZERO } from "./utils/constants";
+import { publicKey } from "@/marshmallow/index";
+import { AccountMeta } from "node_modules/@solana/web3.js/lib/index";
 ObservationInfoLayout.span; // do not delete this line
 
 const logger = createLogger("Raydium_Clmm");
@@ -73,7 +75,49 @@ interface CreatePoolInstruction {
   ammConfigId: PublicKey;
   initialPriceX64: BN;
   forerunCreate?: boolean;
+  exclusiveTradingPeriodStartTime: BN;
+  exclusiveTradingPeriodEndTime: BN;
+  projectManager: PublicKey;
+  feeTierIndex?: number;
+  launchType: number;
+
+  //
+  hyperlaneProgramId: PublicKey;
+  hyperlaneUniqueMessageIdKey: PublicKey;
+  vaultProgramId: PublicKey;
+  splNoopProgramId: PublicKey;
   extendMintAccount?: PublicKey[];
+}
+
+function getAccountsForHyperlaneMessage(
+  uniqueMessageIdKey: PublicKey,
+  vaultProgramId: PublicKey,
+  hyperlaneProgramId: PublicKey,
+  splNoopProgramId: PublicKey,
+): Array<AccountMeta> {
+  const outboxPDA = PublicKey.findProgramAddressSync(
+    [Buffer.from("hyperlane-outbox")],
+    hyperlaneProgramId,
+  )[0];
+
+  const dispatchedMessageAccount = PublicKey.findProgramAddressSync(
+    [Buffer.from("hyperlane-dispatched_message-"), uniqueMessageIdKey.toBuffer()],
+    hyperlaneProgramId,
+  )[0];
+
+  const dispatchAuthorityPDA = PublicKey.findProgramAddressSync(
+    [Buffer.from("hyperlane_dispatcher"), Buffer.from("-"), Buffer.from("dispatch_authority")],
+    vaultProgramId,
+  )[0];
+
+  return [
+    { pubkey: outboxPDA, isSigner: false, isWritable: true },
+    { pubkey: dispatchAuthorityPDA, isSigner: false, isWritable: true },
+    { pubkey: splNoopProgramId, isSigner: false, isWritable: false },
+    { pubkey: uniqueMessageIdKey, isSigner: true, isWritable: false },
+    { pubkey: dispatchedMessageAccount, isSigner: false, isWritable: true },
+    { pubkey: hyperlaneProgramId, isSigner: false, isWritable: false },
+  ];
 }
 
 export class ClmmInstrument {
@@ -91,9 +135,28 @@ export class ClmmInstrument {
     mintProgramIdB: PublicKey,
     exTickArrayBitmap: PublicKey,
     sqrtPriceX64: BN,
+    exclusiveTradingPeriodStartTime: BN,
+    exclusiveTradingPeriodEndTime: BN,
+    projectManager: PublicKey,
+    feeTierIndex: number,
+    launchType: number,
+
+    // Accounts required for sending message through vault
+    vaultProgramId: PublicKey,
+    hyperlaneUniqueMessageIdKey: PublicKey,
+    hyperlaneProgramId: PublicKey,
+    splNoopProgramId: PublicKey,
     extendMintAccount?: PublicKey[],
   ): TransactionInstruction {
-    const dataLayout = struct([u128("sqrtPriceX64"), u64("zero")]);
+    const dataLayout = struct([
+      u128("sqrtPriceX64"),
+      u64("zero"),
+      u64("exclusiveTradingPeriodStartTime"),
+      u64("exclusiveTradingPeriodEndTime"),
+      publicKey("projectManager"),
+      u64("feeTierIndex"),
+      u64("launchType"),
+    ]);
 
     const keys = [
       { pubkey: poolCreator, isSigner: true, isWritable: true },
@@ -110,6 +173,8 @@ export class ClmmInstrument {
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
       { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: false },
       ...(extendMintAccount?.map((k) => ({ pubkey: k, isSigner: false, isWritable: false })) || []),
+      ...getAccountsForHyperlaneMessage(hyperlaneUniqueMessageIdKey, vaultProgramId, hyperlaneProgramId, splNoopProgramId),
+      { pubkey: vaultProgramId, isSigner: false, isWritable: false },
     ];
 
     const data = Buffer.alloc(dataLayout.span);
@@ -117,6 +182,11 @@ export class ClmmInstrument {
       {
         sqrtPriceX64,
         zero: ZERO,
+        exclusiveTradingPeriodStartTime,
+        exclusiveTradingPeriodEndTime,
+        projectManager,
+        feeTierIndex,
+        launchType,
       },
       data,
     );
@@ -138,7 +208,7 @@ export class ClmmInstrument {
       mintBVault: PublicKey;
     }>
   > {
-    const { programId, owner, mintA, mintB, ammConfigId, initialPriceX64, extendMintAccount } = props;
+    const { programId, owner, mintA, mintB, ammConfigId, initialPriceX64, extendMintAccount, exclusiveTradingPeriodStartTime, exclusiveTradingPeriodEndTime, projectManager, feeTierIndex, launchType, hyperlaneProgramId, hyperlaneUniqueMessageIdKey, vaultProgramId, splNoopProgramId } = props;
     const [mintAAddress, mintBAddress] = [new PublicKey(mintA.address), new PublicKey(mintB.address)];
 
     const { publicKey: poolId } = getPdaPoolId(programId, ammConfigId, mintAAddress, mintBAddress);
@@ -162,6 +232,15 @@ export class ClmmInstrument {
         new PublicKey(mintB.programId || TOKEN_PROGRAM_ID),
         exBitmapAccount,
         initialPriceX64,
+        exclusiveTradingPeriodStartTime,
+        exclusiveTradingPeriodEndTime,
+        projectManager,
+        feeTierIndex,
+        launchType,
+        hyperlaneProgramId,
+        hyperlaneUniqueMessageIdKey,
+        vaultProgramId,
+        splNoopProgramId,
         extendMintAccount,
       ),
     ];
@@ -1041,72 +1120,74 @@ export class ClmmInstrument {
     const { publicKey: protocolPosition } = getPdaProtocolPositionAddress(programId, id, tickLower, tickUpper);
 
     const ins = nft2022
-      ? priceUpdateAccount ? this.openPositionFromLiquidityByProjectManagerInstruction22(
-          programId,
-          ownerInfo.wallet,
-          id,
-          ownerInfo.wallet,
-          nftMintAccount,
-          positionNftAccount,
-          protocolPosition,
-          tickArrayLower,
-          tickArrayUpper,
-          personalPosition,
-          ownerInfo.tokenAccountA,
-          ownerInfo.tokenAccountB,
-          new PublicKey(poolKeys.vault.A),
-          new PublicKey(poolKeys.vault.B),
-          new PublicKey(poolKeys.mintA.address),
-          new PublicKey(poolKeys.mintB.address),
-          priceUpdateAccount!,
+      ? priceUpdateAccount
+        ? this.openPositionFromLiquidityByProjectManagerInstruction22(
+            programId,
+            ownerInfo.wallet,
+            id,
+            ownerInfo.wallet,
+            nftMintAccount,
+            positionNftAccount,
+            protocolPosition,
+            tickArrayLower,
+            tickArrayUpper,
+            personalPosition,
+            ownerInfo.tokenAccountA,
+            ownerInfo.tokenAccountB,
+            new PublicKey(poolKeys.vault.A),
+            new PublicKey(poolKeys.vault.B),
+            new PublicKey(poolKeys.mintA.address),
+            new PublicKey(poolKeys.mintB.address),
+            priceUpdateAccount!,
 
-          tickLower,
-          tickUpper,
-          tickArrayLowerStartIndex,
-          tickArrayUpperStartIndex,
-          liquidity,
-          amountMaxA,
-          amountMaxB,
-          withMetadata,
-          PoolUtils.isOverflowDefaultTickarrayBitmap(poolInfo.config.tickSpacing, [
+            tickLower,
+            tickUpper,
             tickArrayLowerStartIndex,
             tickArrayUpperStartIndex,
-          ])
-            ? getPdaExBitmapAccount(programId, id).publicKey
-            : undefined,
-        ) : this.openPositionFromLiquidityInstruction22(
-          programId,
-          ownerInfo.wallet,
-          id,
-          ownerInfo.wallet,
-          nftMintAccount,
-          positionNftAccount,
-          protocolPosition,
-          tickArrayLower,
-          tickArrayUpper,
-          personalPosition,
-          ownerInfo.tokenAccountA,
-          ownerInfo.tokenAccountB,
-          new PublicKey(poolKeys.vault.A),
-          new PublicKey(poolKeys.vault.B),
-          new PublicKey(poolKeys.mintA.address),
-          new PublicKey(poolKeys.mintB.address),
+            liquidity,
+            amountMaxA,
+            amountMaxB,
+            withMetadata,
+            PoolUtils.isOverflowDefaultTickarrayBitmap(poolInfo.config.tickSpacing, [
+              tickArrayLowerStartIndex,
+              tickArrayUpperStartIndex,
+            ])
+              ? getPdaExBitmapAccount(programId, id).publicKey
+              : undefined,
+          )
+        : this.openPositionFromLiquidityInstruction22(
+            programId,
+            ownerInfo.wallet,
+            id,
+            ownerInfo.wallet,
+            nftMintAccount,
+            positionNftAccount,
+            protocolPosition,
+            tickArrayLower,
+            tickArrayUpper,
+            personalPosition,
+            ownerInfo.tokenAccountA,
+            ownerInfo.tokenAccountB,
+            new PublicKey(poolKeys.vault.A),
+            new PublicKey(poolKeys.vault.B),
+            new PublicKey(poolKeys.mintA.address),
+            new PublicKey(poolKeys.mintB.address),
 
-          tickLower,
-          tickUpper,
-          tickArrayLowerStartIndex,
-          tickArrayUpperStartIndex,
-          liquidity,
-          amountMaxA,
-          amountMaxB,
-          withMetadata,
-          PoolUtils.isOverflowDefaultTickarrayBitmap(poolInfo.config.tickSpacing, [
+            tickLower,
+            tickUpper,
             tickArrayLowerStartIndex,
             tickArrayUpperStartIndex,
-          ])
-            ? getPdaExBitmapAccount(programId, id).publicKey
-            : undefined,
-        )
+            liquidity,
+            amountMaxA,
+            amountMaxB,
+            withMetadata,
+            PoolUtils.isOverflowDefaultTickarrayBitmap(poolInfo.config.tickSpacing, [
+              tickArrayLowerStartIndex,
+              tickArrayUpperStartIndex,
+            ])
+              ? getPdaExBitmapAccount(programId, id).publicKey
+              : undefined,
+          )
       : this.openPositionFromLiquidityInstruction(
           programId,
           ownerInfo.wallet,
