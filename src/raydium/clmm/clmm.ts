@@ -61,6 +61,7 @@ import {
 } from "./utils/pda";
 import { PoolUtils, clmmComputeInfoToApiInfo } from "./utils/pool";
 import { TickUtils } from "./utils/tick";
+import { Keypair } from "node_modules/@solana/web3.js/lib/index";
 
 export class Clmm extends ModuleBase {
   constructor(params: ModuleBaseProps) {
@@ -93,7 +94,6 @@ export class Clmm extends ModuleBase {
       feeTierIndex,
       launchType,
       hyperlaneProgramId,
-      hyperlaneUniqueMessageIdKey,
       vaultProgramId,
       splNoopProgramId,
     } = props;
@@ -118,6 +118,10 @@ export class Clmm extends ModuleBase {
       if (r) extendMintAccount.push(fetchAccounts[idx]);
     });
 
+    const hyperlaneUniqueMessageKeypair: Keypair = Keypair.generate();
+    const hyperlaneUniqueMessageIdKey = hyperlaneUniqueMessageKeypair.publicKey;
+
+
     const insInfo = await ClmmInstrument.createPoolInstructions({
       connection: this.scope.connection,
       programId,
@@ -138,6 +142,8 @@ export class Clmm extends ModuleBase {
       vaultProgramId,
       splNoopProgramId,
     });
+
+    insInfo.signers.push(hyperlaneUniqueMessageKeypair);
 
     txBuilder.addInstruction(insInfo);
     txBuilder.addCustomComputeBudget(computeBudgetConfig);
