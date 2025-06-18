@@ -158,6 +158,11 @@ export class ClmmInstrument {
       u64("launchType"),
     ]);
 
+    let vaultParams = PublicKey.findProgramAddressSync(
+      [Buffer.from("vault_params_seed")],
+      vaultProgramId,
+    )[0];
+
     const keys = [
       { pubkey: poolCreator, isSigner: true, isWritable: true },
       { pubkey: ammConfigId, isSigner: false, isWritable: false },
@@ -173,6 +178,8 @@ export class ClmmInstrument {
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
       { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: false },
       ...(extendMintAccount?.map((k) => ({ pubkey: k, isSigner: false, isWritable: false })) || []),
+      { pubkey: vaultParams, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
       ...getAccountsForHyperlaneMessage(hyperlaneUniqueMessageIdKey, vaultProgramId, hyperlaneProgramId, splNoopProgramId),
       { pubkey: vaultProgramId, isSigner: false, isWritable: false },
     ];
