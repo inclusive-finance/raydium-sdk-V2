@@ -305,7 +305,6 @@ export interface CreateConcentratedPool<T = TxVersion.LEGACY> {
   launchType: number;
 
   hyperlaneProgramId: PublicKey;
-  hyperlaneUniqueMessageIdKey: PublicKey;
   vaultProgramId: PublicKey;
   splNoopProgramId: PublicKey;
 }
