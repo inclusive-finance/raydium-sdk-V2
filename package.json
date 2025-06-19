@@ -1,7 +1,7 @@
 {
-  "name": "@caishen/raydium-sdk-v2",
-  "version": "0.1.139-alpha",
-  "description": "An SDK for building applications on top of Raydium.",
+  "name": "@inclusivelayer/raydium-sdk-v2",
+  "version": "0.0.1",
+  "description": "An SDK for building applications on top of Caishen AMM.",
   "license": "GPL-3.0",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -10,7 +10,7 @@
     "./lib",
     "./src"
   ],
-  "repository": "https://github.com/raydium-io/raydium-sdk-V2",
+  "repository": "https://github.com/inclusivelayer/raydium-sdk-v2",
   "publicConfig": {
     "registry": "https://registry.yarnpkg.com",
     "access": "public"

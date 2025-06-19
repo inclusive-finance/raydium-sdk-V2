@@ -1311,50 +1311,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@caishen/raydium-sdk-v2@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@caishen/raydium-sdk-v2@workspace:."
-  dependencies:
-    "@babel/core": ^7.18.0
-    "@babel/preset-env": ^7.18.0
-    "@babel/preset-typescript": ^7.17.12
-    "@solana/buffer-layout": ^4.0.1
-    "@solana/spl-token": ^0.4.8
-    "@solana/web3.js": ^1.95.3
-    "@tsconfig/node14": ^1.0.3
-    "@types/big.js": ^6.1.3
-    "@types/bn.js": ^5.1.1
-    "@types/jest": ^27.5.1
-    "@types/lodash": ^4.14.182
-    "@types/node": ^17.0.35
-    "@typescript-eslint/eslint-plugin": ^5.25.0
-    "@typescript-eslint/parser": ^5.25.0
-    axios: ^1.1.3
-    babel-jest: ^27.5.1
-    big.js: ^6.2.1
-    bn.js: ^5.2.1
-    dayjs: ^1.11.5
-    decimal.js-light: ^2.5.1
-    eslint: ^8.15.0
-    eslint-plugin-tsdoc: ^0.2.16
-    husky: ^7.0.4
-    jest: ^27.5.1
-    jsonfile: ^6.1.0
-    lint-staged: ^12.4.1
-    lodash: ^4.17.21
-    prettier: ^2.6.2
-    toformat: ^2.0.0
-    ts-jest: ^27.0.7
-    ts-jest-resolver: ^2.0.0
-    ts-node: ^10.7.0
-    tsconfig-paths: ^4.2.0
-    tsup: ^5.12.8
-    typedoc: ^0.22.15
-    typescript: ^4.7.3
-    yarn: ^1.22.19
-  languageName: unknown
-  linkType: soft
-
 "@cspotcode/source-map-support@npm:^0.8.0":
   version: 0.8.1
   resolution: "@cspotcode/source-map-support@npm:0.8.1"
@@ -1437,6 +1393,50 @@ __metadata:
   checksum: d3b78f6c5831888c6ecc899df0d03bcc25d46f3ad26a11d7ea52944dc36a35ef543fad965322174238d677a43d5c694434f6607532cff7077062513ad7022631
   languageName: node
   linkType: hard
+
+"@inclusivelayer/raydium-sdk-v2@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@inclusivelayer/raydium-sdk-v2@workspace:."
+  dependencies:
+    "@babel/core": ^7.18.0
+    "@babel/preset-env": ^7.18.0
+    "@babel/preset-typescript": ^7.17.12
+    "@solana/buffer-layout": ^4.0.1
+    "@solana/spl-token": ^0.4.8
+    "@solana/web3.js": ^1.95.3
+    "@tsconfig/node14": ^1.0.3
+    "@types/big.js": ^6.1.3
+    "@types/bn.js": ^5.1.1
+    "@types/jest": ^27.5.1
+    "@types/lodash": ^4.14.182
+    "@types/node": ^17.0.35
+    "@typescript-eslint/eslint-plugin": ^5.25.0
+    "@typescript-eslint/parser": ^5.25.0
+    axios: ^1.1.3
+    babel-jest: ^27.5.1
+    big.js: ^6.2.1
+    bn.js: ^5.2.1
+    dayjs: ^1.11.5
+    decimal.js-light: ^2.5.1
+    eslint: ^8.15.0
+    eslint-plugin-tsdoc: ^0.2.16
+    husky: ^7.0.4
+    jest: ^27.5.1
+    jsonfile: ^6.1.0
+    lint-staged: ^12.4.1
+    lodash: ^4.17.21
+    prettier: ^2.6.2
+    toformat: ^2.0.0
+    ts-jest: ^27.0.7
+    ts-jest-resolver: ^2.0.0
+    ts-node: ^10.7.0
+    tsconfig-paths: ^4.2.0
+    tsup: ^5.12.8
+    typedoc: ^0.22.15
+    typescript: ^4.7.3
+    yarn: ^1.22.19
+  languageName: unknown
+  linkType: soft
 
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
