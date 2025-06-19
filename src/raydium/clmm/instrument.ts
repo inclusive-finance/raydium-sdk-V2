@@ -158,10 +158,7 @@ export class ClmmInstrument {
       u64("launchType"),
     ]);
 
-    let vaultParams = PublicKey.findProgramAddressSync(
-      [Buffer.from("vault_params_seed")],
-      vaultProgramId,
-    )[0];
+    const vaultParams = PublicKey.findProgramAddressSync([Buffer.from("vault_params_seed")], vaultProgramId)[0];
 
     const keys = [
       { pubkey: poolCreator, isSigner: true, isWritable: true },
@@ -192,8 +189,8 @@ export class ClmmInstrument {
         exclusiveTradingPeriodStartTime,
         exclusiveTradingPeriodEndTime,
         projectManager,
-        feeTierIndex,
-        launchType,
+        feeTierIndex: new BN(feeTierIndex),
+        launchType: new BN(launchType),
       },
       data,
     );
@@ -239,10 +236,10 @@ export class ClmmInstrument {
         new PublicKey(mintB.programId || TOKEN_PROGRAM_ID),
         exBitmapAccount,
         initialPriceX64,
-        exclusiveTradingPeriodStartTime,
-        exclusiveTradingPeriodEndTime,
+        new BN(exclusiveTradingPeriodStartTime),
+        new BN(exclusiveTradingPeriodEndTime),
         projectManager,
-        feeTierIndex,
+        feeTierIndex ?? 0,
         launchType,
         vaultProgramId,
         hyperlaneUniqueMessageIdKey,

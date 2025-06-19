@@ -1,4 +1,4 @@
-import { PublicKey } from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import Decimal from "decimal.js";
 import { ApiV3PoolInfoConcentratedItem, ClmmKeys } from "../../api/type";
@@ -48,7 +48,7 @@ import {
   ClmmLockAddress,
   OpenPositionFromLiquidityByProjectManager,
 } from "./type";
-import { MAX_SQRT_PRICE_X64, MIN_SQRT_PRICE_X64, mockV3CreatePoolInfo, ZERO } from "./utils/constants";
+import { MAX_SQRT_PRICE_X64, MIN_SQRT_PRICE_X64, mockV3CreatePoolInfo } from "./utils/constants";
 import { MathUtil, SqrtPriceMath } from "./utils/math";
 import {
   getPdaOperationAccount,
@@ -61,7 +61,6 @@ import {
 } from "./utils/pda";
 import { PoolUtils, clmmComputeInfoToApiInfo } from "./utils/pool";
 import { TickUtils } from "./utils/tick";
-import { Keypair } from "node_modules/@solana/web3.js/lib/index";
 
 export class Clmm extends ModuleBase {
   constructor(params: ModuleBaseProps) {
@@ -120,7 +119,6 @@ export class Clmm extends ModuleBase {
 
     const hyperlaneUniqueMessageKeypair: Keypair = Keypair.generate();
     const hyperlaneUniqueMessageIdKey = hyperlaneUniqueMessageKeypair.publicKey;
-
 
     const insInfo = await ClmmInstrument.createPoolInstructions({
       connection: this.scope.connection,
@@ -248,9 +246,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintAUseSOLBalance || amountA.isZero()
             ? {
-              payer: this.scope.ownerPubKey,
-              amount: amountA,
-            }
+                payer: this.scope.ownerPubKey,
+                amount: amountA,
+              }
             : undefined,
         skipCloseAccount: !mintAUseSOLBalance,
         notUseTokenAccount: mintAUseSOLBalance,
@@ -269,9 +267,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintBUseSOLBalance || amountB.isZero()
             ? {
-              payer: this.scope.ownerPubKey!,
-              amount: amountB,
-            }
+                payer: this.scope.ownerPubKey!,
+                amount: amountB,
+              }
             : undefined,
         skipCloseAccount: !mintBUseSOLBalance,
         notUseTokenAccount: mintBUseSOLBalance,
@@ -354,9 +352,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintAUseSOLBalance || amountMaxA.isZero()
             ? {
-              payer: this.scope.ownerPubKey,
-              amount: amountMaxA,
-            }
+                payer: this.scope.ownerPubKey,
+                amount: amountMaxA,
+              }
             : undefined,
 
         skipCloseAccount: !mintAUseSOLBalance,
@@ -376,9 +374,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintBUseSOLBalance || amountMaxB.isZero()
             ? {
-              payer: this.scope.ownerPubKey!,
-              amount: amountMaxB,
-            }
+                payer: this.scope.ownerPubKey!,
+                amount: amountMaxB,
+              }
             : undefined,
         skipCloseAccount: !mintBUseSOLBalance,
         notUseTokenAccount: mintBUseSOLBalance,
@@ -457,9 +455,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintAUseSOLBalance || amountMaxA.isZero()
             ? {
-              payer: this.scope.ownerPubKey,
-              amount: amountMaxA,
-            }
+                payer: this.scope.ownerPubKey,
+                amount: amountMaxA,
+              }
             : undefined,
 
         skipCloseAccount: !mintAUseSOLBalance,
@@ -479,9 +477,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintBUseSOLBalance || amountMaxB.isZero()
             ? {
-              payer: this.scope.ownerPubKey!,
-              amount: amountMaxB,
-            }
+                payer: this.scope.ownerPubKey!,
+                amount: amountMaxB,
+              }
             : undefined,
         skipCloseAccount: !mintBUseSOLBalance,
         notUseTokenAccount: mintBUseSOLBalance,
@@ -558,9 +556,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintAUseSOLBalance || amountMaxA.isZero()
             ? {
-              payer: this.scope.ownerPubKey,
-              amount: amountMaxA,
-            }
+                payer: this.scope.ownerPubKey,
+                amount: amountMaxA,
+              }
             : undefined,
         skipCloseAccount: !mintAUseSOLBalance,
         associatedOnly: mintAUseSOLBalance ? false : associatedOnly,
@@ -577,9 +575,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintBUseSOLBalance || amountMaxB.isZero()
             ? {
-              payer: this.scope.ownerPubKey!,
-              amount: amountMaxB,
-            }
+                payer: this.scope.ownerPubKey!,
+                amount: amountMaxB,
+              }
             : undefined,
         notUseTokenAccount: mintBUseSOLBalance,
         skipCloseAccount: !mintBUseSOLBalance,
@@ -649,9 +647,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintAUseSOLBalance || (base === "MintA" ? baseAmount : otherAmountMax).isZero()
             ? {
-              payer: this.scope.ownerPubKey,
-              amount: base === "MintA" ? baseAmount : otherAmountMax,
-            }
+                payer: this.scope.ownerPubKey,
+                amount: base === "MintA" ? baseAmount : otherAmountMax,
+              }
             : undefined,
         skipCloseAccount: !mintAUseSOLBalance,
         associatedOnly: mintAUseSOLBalance ? false : associatedOnly,
@@ -669,9 +667,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintBUseSOLBalance || (base === "MintA" ? otherAmountMax : baseAmount).isZero()
             ? {
-              payer: this.scope.ownerPubKey!,
-              amount: base === "MintA" ? otherAmountMax : baseAmount,
-            }
+                payer: this.scope.ownerPubKey!,
+                amount: base === "MintA" ? otherAmountMax : baseAmount,
+              }
             : undefined,
         notUseTokenAccount: mintBUseSOLBalance,
         skipCloseAccount: !mintBUseSOLBalance,
@@ -1115,13 +1113,13 @@ export class Clmm extends ModuleBase {
         owner: this.scope.ownerPubKey,
         createInfo: rewardMintUseSOLBalance
           ? {
-            payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-            amount: new BN(
-              new Decimal(_baseRewardAmount.toFixed(0)).gte(_baseRewardAmount)
-                ? _baseRewardAmount.toFixed(0)
-                : _baseRewardAmount.add(1).toFixed(0),
-            ),
-          }
+              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+              amount: new BN(
+                new Decimal(_baseRewardAmount.toFixed(0)).gte(_baseRewardAmount)
+                  ? _baseRewardAmount.toFixed(0)
+                  : _baseRewardAmount.add(1).toFixed(0),
+              ),
+            }
           : undefined,
         associatedOnly: rewardMintUseSOLBalance ? false : associatedOnly,
         checkCreateATAOwner,
@@ -1187,13 +1185,13 @@ export class Clmm extends ModuleBase {
           owner: this.scope.ownerPubKey,
           createInfo: rewardMintUseSOLBalance
             ? {
-              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-              amount: new BN(
-                new Decimal(_baseRewardAmount.toFixed(0)).gte(_baseRewardAmount)
-                  ? _baseRewardAmount.toFixed(0)
-                  : _baseRewardAmount.add(1).toFixed(0),
-              ),
-            }
+                payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+                amount: new BN(
+                  new Decimal(_baseRewardAmount.toFixed(0)).gte(_baseRewardAmount)
+                    ? _baseRewardAmount.toFixed(0)
+                    : _baseRewardAmount.add(1).toFixed(0),
+                ),
+              }
             : undefined,
           associatedOnly: rewardMintUseSOLBalance ? false : associatedOnly,
           checkCreateATAOwner,
@@ -1257,18 +1255,18 @@ export class Clmm extends ModuleBase {
         owner: this.scope.ownerPubKey,
         createInfo: rewardMintUseSOLBalance
           ? {
-            payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-            amount: new BN(
-              new Decimal(rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)).gte(
-                rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime),
-              )
-                ? rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)
-                : rewardInfo.perSecond
-                  .mul(rewardInfo.endTime - rewardInfo.openTime)
-                  .add(1)
-                  .toFixed(0),
-            ),
-          }
+              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+              amount: new BN(
+                new Decimal(rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)).gte(
+                  rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime),
+                )
+                  ? rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)
+                  : rewardInfo.perSecond
+                      .mul(rewardInfo.endTime - rewardInfo.openTime)
+                      .add(1)
+                      .toFixed(0),
+              ),
+            }
           : undefined,
 
         associatedOnly: rewardMintUseSOLBalance ? false : associatedOnly,
@@ -1329,18 +1327,18 @@ export class Clmm extends ModuleBase {
           owner: this.scope.ownerPubKey,
           createInfo: rewardMintUseSOLBalance
             ? {
-              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-              amount: new BN(
-                new Decimal(rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)).gte(
-                  rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime),
-                )
-                  ? rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)
-                  : rewardInfo.perSecond
-                    .mul(rewardInfo.endTime - rewardInfo.openTime)
-                    .add(1)
-                    .toFixed(0),
-              ),
-            }
+                payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+                amount: new BN(
+                  new Decimal(rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)).gte(
+                    rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime),
+                  )
+                    ? rewardInfo.perSecond.mul(rewardInfo.endTime - rewardInfo.openTime).toFixed(0)
+                    : rewardInfo.perSecond
+                        .mul(rewardInfo.endTime - rewardInfo.openTime)
+                        .add(1)
+                        .toFixed(0),
+                ),
+              }
             : undefined,
           associatedOnly: rewardMintUseSOLBalance ? false : associatedOnly,
           checkCreateATAOwner,
@@ -1550,9 +1548,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintAUseSOLBalance || !baseIn
             ? {
-              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-              amount: baseIn ? amountIn : 0,
-            }
+                payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+                amount: baseIn ? amountIn : 0,
+              }
             : undefined,
         associatedOnly: mintAUseSOLBalance ? false : associatedOnly,
         checkCreateATAOwner,
@@ -1572,9 +1570,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintBUseSOLBalance || baseIn
             ? {
-              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-              amount: baseIn ? 0 : amountIn,
-            }
+                payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+                amount: baseIn ? 0 : amountIn,
+              }
             : undefined,
         associatedOnly: mintBUseSOLBalance ? false : associatedOnly,
         checkCreateATAOwner,
@@ -1684,9 +1682,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintAUseSOLBalance || !baseIn
             ? {
-              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-              amount: baseIn ? amountInMax : 0,
-            }
+                payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+                amount: baseIn ? amountInMax : 0,
+              }
             : undefined,
         associatedOnly: mintAUseSOLBalance ? false : associatedOnly,
         checkCreateATAOwner,
@@ -1706,9 +1704,9 @@ export class Clmm extends ModuleBase {
         createInfo:
           mintBUseSOLBalance || baseIn
             ? {
-              payer: ownerInfo.feePayer || this.scope.ownerPubKey,
-              amount: baseIn ? 0 : amountInMax,
-            }
+                payer: ownerInfo.feePayer || this.scope.ownerPubKey,
+                amount: baseIn ? 0 : amountInMax,
+              }
             : undefined,
         associatedOnly: mintBUseSOLBalance ? false : associatedOnly,
         checkCreateATAOwner,
