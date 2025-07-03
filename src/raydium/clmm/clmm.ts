@@ -722,6 +722,7 @@ export class Clmm extends ModuleBase {
       txTipConfig,
       txVersion,
       feePayer,
+      priceUpdateAccount,
     } = props;
     if (this.scope.availability.removeConcentratedPosition === false)
       this.logAndCreateError("remove position feature disabled in your region");
@@ -817,6 +818,7 @@ export class Clmm extends ModuleBase {
         tokenAccountB: ownerTokenAccountB!,
         rewardAccounts,
       },
+      priceUpdateAccount: priceUpdateAccount!,
       liquidity,
       amountMinA,
       amountMinB,
@@ -1761,6 +1763,7 @@ export class Clmm extends ModuleBase {
     txVersion,
     computeBudgetConfig,
     feePayer,
+    priceUpdateAccount,
   }: HarvestAllRewardsParams<T>): Promise<MakeMultiTxData<T>> {
     const ownerMintToAccount: { [mint: string]: PublicKey } = {};
     for (const item of this.scope.account.tokenAccountRawInfos) {
@@ -1953,6 +1956,7 @@ export class Clmm extends ModuleBase {
               tokenAccountB: ownerTokenAccountB,
               rewardAccounts,
             },
+            priceUpdateAccount: priceUpdateAccount!,
             liquidity: new BN(0),
             amountMinA: new BN(0),
             amountMinB: new BN(0),

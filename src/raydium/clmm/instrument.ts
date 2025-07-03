@@ -1681,6 +1681,7 @@ export class ClmmInstrument {
     mintVaultB: PublicKey,
     mintMintA: PublicKey,
     mintMintB: PublicKey,
+    priceUpdateAccount: PublicKey,
     rewardAccounts: {
       poolRewardVault: PublicKey;
       ownerRewardVault: PublicKey;
@@ -1726,6 +1727,7 @@ export class ClmmInstrument {
 
       { pubkey: mintMintA, isSigner: false, isWritable: false },
       { pubkey: mintMintB, isSigner: false, isWritable: false },
+      { pubkey: priceUpdateAccount, isSigner: false, isWritable: true },
 
       ...remainingAccounts,
     ];
@@ -1758,6 +1760,7 @@ export class ClmmInstrument {
     amountMinA,
     amountMinB,
     programId,
+    priceUpdateAccount,
     nft2022,
   }: {
     poolInfo: ApiV3PoolInfoConcentratedItem;
@@ -1769,7 +1772,7 @@ export class ClmmInstrument {
       tokenAccountB: PublicKey;
       rewardAccounts: PublicKey[];
     };
-
+    priceUpdateAccount: PublicKey;
     liquidity: BN;
     amountMinA: BN;
     amountMinB: BN;
@@ -1828,6 +1831,7 @@ export class ClmmInstrument {
       new PublicKey(poolKeys.vault.B),
       new PublicKey(poolInfo.mintA.address),
       new PublicKey(poolInfo.mintB.address),
+      priceUpdateAccount,
       rewardAccounts,
 
       liquidity,
