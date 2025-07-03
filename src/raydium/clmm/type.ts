@@ -391,6 +391,7 @@ export interface DecreaseLiquidity<T = TxVersion.LEGACY> {
   amountMinA: BN;
   amountMinB: BN;
   nftAccount?: PublicKey;
+  priceUpdateAccount?: PublicKey;
 
   associatedOnly?: boolean;
   checkCreateATAOwner?: boolean;
@@ -641,6 +642,7 @@ export interface HarvestAllRewardsParams<T = TxVersion.LEGACY> {
   computeBudgetConfig?: ComputeBudgetConfig;
   txTipConfig?: TxTipConfig;
   feePayer?: PublicKey;
+  priceUpdateAccount?: PublicKey;
 }
 
 export interface TickArrayBitmapExtensionType {
