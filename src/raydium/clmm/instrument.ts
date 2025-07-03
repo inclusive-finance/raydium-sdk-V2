@@ -1707,10 +1707,13 @@ export class ClmmInstrument {
         .flat(),
     ];
 
+    const { publicKey: ammConfig } = getPdaAmmConfigId(programId);
+
     const keys = [
       { pubkey: positionNftOwner, isSigner: true, isWritable: false },
       { pubkey: positionNftAccount, isSigner: false, isWritable: false },
       { pubkey: personalPosition, isSigner: false, isWritable: true },
+      { pubkey: ammConfig, isSigner: false, isWritable: false },
       { pubkey: poolId, isSigner: false, isWritable: true },
       { pubkey: protocolPosition, isSigner: false, isWritable: true },
       { pubkey: mintVaultA, isSigner: false, isWritable: true },
