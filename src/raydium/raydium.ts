@@ -5,7 +5,7 @@ import { Api, API_URL_CONFIG, ApiV3TokenRes, ApiV3Token, JupTokenType, Availabil
 import { EMPTY_CONNECTION, EMPTY_OWNER } from "../common/error";
 import { createLogger, Logger } from "../common/logger";
 import { Owner } from "../common/owner";
-import { Cluster } from "../solana";
+import { Cluster, Environment } from "../solana";
 
 import Account, { TokenAccountDataProp } from "./account/account";
 import Farm from "./farm/farm";
@@ -27,6 +27,8 @@ export interface RaydiumLoadParams extends TokenAccountDataProp, Omit<RaydiumApi
   connection: Connection;
   // solana cluster/network/env
   cluster?: Cluster;
+  // environment for program IDs (testnet or mainnet)
+  environment?: Environment;
   // user public key
   owner?: PublicKey | Keypair;
   /* ================= api ================= */
@@ -69,6 +71,7 @@ interface ApiData {
 
 export class Raydium {
   public cluster: Cluster;
+  public environment: Environment;
   public farm: Farm;
   public account: Account;
   public liquidity: Liquidity;
@@ -108,6 +111,7 @@ export class Raydium {
     const {
       connection,
       cluster,
+      environment,
       owner,
       api,
       defaultChainTime,
@@ -119,6 +123,7 @@ export class Raydium {
 
     this._connection = connection;
     this.cluster = cluster || "mainnet";
+    this.environment = environment || "testnet";
     this._owner = owner ? new Owner(owner) : undefined;
     this._signAllTransactions = config.signAllTransactions;
     this.blockhashCommitment = blockhashCommitment;
@@ -137,7 +142,7 @@ export class Raydium {
     this.liquidity = new Liquidity({ scope: this, moduleName: "Raydium_LiquidityV2" });
     this.token = new TokenModule({ scope: this, moduleName: "Raydium_tokenV2" });
     this.tradeV2 = new TradeV2({ scope: this, moduleName: "Raydium_tradeV2" });
-    this.clmm = new Clmm({ scope: this, moduleName: "Raydium_clmm" });
+    this.clmm = new Clmm({ scope: this, moduleName: "Raydium_clmm", environment: this.environment });
     this.cpmm = new Cpmm({ scope: this, moduleName: "Raydium_cpmm" });
     this.utils1216 = new Utils1216({ scope: this, moduleName: "Raydium_utils1216" });
     this.marketV2 = new MarketV2({ scope: this, moduleName: "Raydium_marketV2" });

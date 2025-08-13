@@ -3,15 +3,15 @@ import BN from "bn.js";
 import Decimal from "decimal.js";
 import { ApiV3PoolInfoConcentratedItem, ClmmKeys } from "../../api/type";
 import {
-  CLMM_LOCK_AUTH_ID,
-  CLMM_LOCK_PROGRAM_ID,
-  CLMM_PROGRAM_ID,
+  TESTNET_PROGRAM_IDS,
+  MAINNET_PROGRAM_IDS,
   InstructionType,
   WSOLMint,
   fetchMultipleMintInfos,
   getATAAddress,
   getMultipleAccountsInfoWithCustomFlags,
 } from "@/common";
+import { Environment } from "@/solana";
 import { AccountLayout, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { MakeMultiTxData, MakeTxData } from "@/common/txTool/txTool";
 import { TxVersion } from "@/common/txTool/txType";
@@ -62,9 +62,24 @@ import {
 import { PoolUtils, clmmComputeInfoToApiInfo } from "./utils/pool";
 import { TickUtils } from "./utils/tick";
 
+export interface ClmmModuleProps extends ModuleBaseProps {
+  environment?: Environment;
+}
+
 export class Clmm extends ModuleBase {
-  constructor(params: ModuleBaseProps) {
+  private clmmProgramId: PublicKey;
+  private clmmLockProgramId: PublicKey;
+  private clmmLockAuthId: PublicKey;
+
+  constructor(params: ClmmModuleProps) {
     super(params);
+    
+    const environment = params.environment || "testnet";
+    const programIds = environment === "mainnet" ? MAINNET_PROGRAM_IDS : TESTNET_PROGRAM_IDS;
+    
+    this.clmmProgramId = programIds.CLMM_PROGRAM_ID;
+    this.clmmLockProgramId = programIds.CLMM_LOCK_PROGRAM_ID;
+    this.clmmLockAuthId = programIds.CLMM_LOCK_AUTH_ID;
   }
 
   public async getClmmPoolKeys(poolId: string): Promise<ClmmKeys> {
@@ -855,9 +870,9 @@ export class Clmm extends ModuleBase {
 
   public async lockPosition<T extends TxVersion>(props: LockPosition<T>): Promise<MakeTxData<ClmmLockAddress>> {
     const {
-      programId = CLMM_LOCK_PROGRAM_ID,
-      authProgramId = CLMM_LOCK_AUTH_ID,
-      poolProgramId = CLMM_PROGRAM_ID,
+      programId = this.clmmLockProgramId,
+      authProgramId = this.clmmLockAuthId,
+      poolProgramId = this.clmmProgramId,
       ownerPosition,
       payer,
       computeBudgetConfig,
@@ -889,9 +904,9 @@ export class Clmm extends ModuleBase {
 
   public async harvestLockPosition<T extends TxVersion>(props: HarvestLockPosition<T>): Promise<MakeTxData<T>> {
     const {
-      programId = CLMM_LOCK_PROGRAM_ID,
-      authProgramId = CLMM_LOCK_AUTH_ID,
-      clmmProgram = CLMM_PROGRAM_ID,
+      programId = this.clmmLockProgramId,
+      authProgramId = this.clmmLockAuthId,
+      clmmProgram = this.clmmProgramId,
       poolKeys: propPoolKeys,
       lockData,
       ownerInfo = { useSOLBalance: true },
@@ -1916,12 +1931,12 @@ export class Clmm extends ModuleBase {
             itemPosition.tickLower,
             itemPosition.tickUpper,
           );
-          const lockPositionId = getPdaLockClPositionIdV2(CLMM_LOCK_PROGRAM_ID, lockData.lockNftMint).publicKey;
+          const lockPositionId = getPdaLockClPositionIdV2(this.clmmLockProgramId, lockData.lockNftMint).publicKey;
           const harvestLockIns = ClmmInstrument.harvestLockPositionInstructionV2({
-            programId: CLMM_LOCK_PROGRAM_ID,
-            auth: CLMM_LOCK_AUTH_ID,
+            programId: this.clmmLockProgramId,
+            auth: this.clmmLockAuthId,
             lockPositionId,
-            clmmProgram: CLMM_PROGRAM_ID,
+            clmmProgram: this.clmmProgramId,
             lockOwner: this.scope.ownerPubKey,
             lockNftMint: lockData.lockNftMint,
             lockNftAccount,
@@ -1938,7 +1953,7 @@ export class Clmm extends ModuleBase {
             mintA: new PublicKey(poolKeys.mintA.address),
             mintB: new PublicKey(poolKeys.mintB.address),
             rewardAccounts: rewardAccountsFullInfo,
-            exTickArrayBitmap: getPdaExBitmapAccount(CLMM_PROGRAM_ID, lockData.poolId).publicKey,
+            exTickArrayBitmap: getPdaExBitmapAccount(this.clmmProgramId, lockData.poolId).publicKey,
           });
           txBuilder.addInstruction({
             instructions: [harvestLockIns],

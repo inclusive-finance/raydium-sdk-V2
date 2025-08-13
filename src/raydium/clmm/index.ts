@@ -1,4 +1,4 @@
-export { Clmm } from "./clmm";
+export { Clmm, ClmmModuleProps } from "./clmm";
 export * from "./type";
 export * from "./layout";
 export * from "./instrument";

@@ -21,6 +21,19 @@ export const CLMM_PROGRAM_ID = new PublicKey("3eap9FEhnPAjd9aatu4Bw2osw6XPZ8cZJH
 export const CLMM_LOCK_PROGRAM_ID = new PublicKey("LockrWmn6K5twhz3y9w1dQERbmgSaRkfnTeTKbpofwE");
 export const CLMM_LOCK_AUTH_ID = new PublicKey("kN1kEznaF5Xbd8LYuqtEFcxzWSBk5Fv6ygX6SqEGJVy");
 
+// Environment-specific program IDs
+export const TESTNET_PROGRAM_IDS = {
+  CLMM_PROGRAM_ID: new PublicKey("3eap9FEhnPAjd9aatu4Bw2osw6XPZ8cZJHjQAv2DjWnH"),
+  CLMM_LOCK_PROGRAM_ID: new PublicKey("LockrWmn6K5twhz3y9w1dQERbmgSaRkfnTeTKbpofwE"),
+  CLMM_LOCK_AUTH_ID: new PublicKey("kN1kEznaF5Xbd8LYuqtEFcxzWSBk5Fv6ygX6SqEGJVy"),
+};
+
+export const MAINNET_PROGRAM_IDS = {
+  CLMM_PROGRAM_ID: new PublicKey("D9cRFLdp8R4Du9QF2v4ov9YCocNHYk1U9YHZotr3E86K"),
+  CLMM_LOCK_PROGRAM_ID: new PublicKey("LockrWmn6K5twhz3y9w1dQERbmgSaRkfnTeTKbpofwE"),
+  CLMM_LOCK_AUTH_ID: new PublicKey("kN1kEznaF5Xbd8LYuqtEFcxzWSBk5Fv6ygX6SqEGJVy"),
+};
+
 export const Router = new PublicKey("routeUGWgWzqBWFcrCfv8tritsqukccJPu3q5GPP3xS");
 export const FEE_DESTINATION_ID = new PublicKey("7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5");
 
